@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra Certa Imóveis - Imóveis Disponíveis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .publico-header {
+            background: var(--text);
+            color: var(--white);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .publico-logo { text-align: center; }
+        .publico-logo img { max-width: 400px; height: auto; display: block; margin: 0 auto 10px; }
+        .publico-contato { color: var(--white); font-size: 1rem; line-height: 1.8; }
+        .publico-contato p { margin: 5px 0; }
+        .publico-content { padding: 30px; max-width: 1200px; margin: 0 auto; }
+        .publico-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .publico-card { background: var(--white); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .publico-card:hover { transform: translateY(-4px); }
+        .publico-card-foto-main { width: 100%; height: 200px; overflow: hidden; cursor: pointer; position: relative; }
+        .publico-card-foto-main img { width: 100%; height: 100%; object-fit: cover; }
+        .publico-card-foto-placeholder { width: 100%; height: 100%; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--text-light); font-size: 3rem; }
+        .publico-card-thumbs { display: flex; gap: 4px; padding: 8px; overflow-x: auto; }
+        .publico-card-thumb { width: 50px; height: 35px; border-radius: 4px; overflow: hidden; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
+        .publico-card-thumb.active { border-color: var(--primary); }
+        .publico-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .publico-card-info { padding: 15px; }
+        .publico-card-titulo { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+        .publico-card-bairro { color: var(--text-light); font-size: 0.9rem; margin-bottom: 10px; }
+        .publico-card-detalhes { display: flex; gap: 15px; color: var(--text-light); font-size: 0.85rem; margin-bottom: 10px; flex-wrap: wrap; }
+        .publico-card-preco { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+        .publico-empty { text-align: center; padding: 60px 20px; color: var(--text-light); }
+        #publicLightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; }
+        #publicLightboxImg { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .lightbox-close { position: absolute; top: 20px; right: 20px; background: transparent; color: white; border: none; font-size: 2rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="publico-header">
+        <div class="publico-logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Compra Certa Imóveis">
+            <div class="publico-contato">
+                <p><i class="fas fa-phone"></i> (18) 99762-8360</p>
+                <p><i class="fas fa-map-marker-alt"></i> Assis-SP</p>
+            </div>
+        </div>
+        <a href="https://wa.me/5518997628360" target="_blank" class="contact-phone">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+    </div>
+
+    <div class="publico-content">
+        <h2>Imóveis Disponíveis</h2>
+        
+        {% if imoveis %}
+        <div class="publico-grid">
+            {% for imovel in imoveis %}
+            <div class="publico-card">
+                {% set fotos = fotos_por_imovel.get(imovel.id, []) %}
+                {% if imovel.foto_capa %}
+                <div class="publico-card-foto-main" onclick="abrirFoto('{{ imovel.foto_capa }}')">
+                    <img src="{{ imovel.foto_capa }}" alt="{{ imovel.titulo }}">
+                </div>
+                {% elif fotos %}
+                <div class="publico-card-foto-main" onclick="abrirFoto('{{ fotos[0].caminho }}')">
+                    <img src="{{ fotos[0].caminho }}" alt="{{ imovel.titulo }}">
+                </div>
+                {% else %}
+                <div class="publico-card-foto-placeholder">
+                    <i class="fas fa-home"></i>
+                </div>
+                {% endif %}
+                {% if fotos|length > 1 %}
+                <div class="publico-card-thumbs">
+                    {% for foto in fotos %}
+                    <div class="publico-card-thumb {% if loop.index0 == 0 %}active{% endif %}" onclick="abrirFoto('{{ foto.caminho }}')">
+                        <img src="{{ foto.caminho }}" alt="Foto {{ loop.index }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="publico-card-info">
+                    <div class="publico-card-titulo">{{ imovel.titulo }}</div>
+                    <div class="publico-card-bairro">
+                        <i class="fas fa-map-marker-alt"></i> {{ imovel.bairro or 'Bairro não informado' }}
+                    </div>
+                    <div class="publico-card-detalhes">
+                        {% if imovel.area %}<span><i class="fas fa-ruler-combined"></i> {{ imovel.area }}m²</span>{% endif %}
+                        {% if imovel.quartos %}<span><i class="fas fa-bed"></i> {{ imovel.quartos }} quartos</span>{% endif %}
+                        {% if imovel.banheiros %}<span><i class="fas fa-bath"></i> {{ imovel.banheiros }}</span>{% endif %}
+                        {% if imovel.vagas %}<span><i class="fas fa-car"></i> {{ imovel.vagas }} vagas</span>{% endif %}
+                    </div>
+                    <div class="publico-card-preco">
+                        {% if imovel.preco %}R$ {{ imovel.preco }}{% else %}Consulte{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="publico-empty">
+            <i class="fas fa-home" style="font-size: 4rem; margin-bottom: 20px;"></i>
+            <h3>Nenhum imóvel disponível no momento</h3>
+            <p>Entre em contato pelo WhatsApp para saber sobre novos imóveis.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div id="publicLightbox" onclick="if(event.target===this) fecharFoto()">
+        <img id="publicLightboxImg" src="" alt="">
+        <button class="lightbox-close" onclick="fecharFoto()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <script>
+        function abrirFoto(src) {
+            if (!src) return;
+            document.getElementById('publicLightboxImg').src = src;
+            document.getElementById('publicLightbox').style.display = 'flex';
+        }
+        function fecharFoto() {
+            document.getElementById('publicLightbox').style.display = 'none';
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') fecharFoto();
+        });
+    </script>
+</body>
+</html>

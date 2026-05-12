@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block header %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <form method="POST" class="form-grid">
+        <div class="form-group">
+            <label for="nome">Nome *</label>
+            <input type="text" id="nome" name="nome" value="{{ lead.nome if lead else '' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="telefone">Telefone *</label>
+            <input type="text" id="telefone" name="telefone" value="{{ lead.telefone if lead else '' }}" placeholder="(00) 00000-0000" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ lead.email if lead else '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="origem">Origem</label>
+            <select id="origem" name="origem">
+                <option value="manual" {{ 'selected' if lead and lead.origem == 'manual' else '' }}>Manual</option>
+                <option value="olx" {{ 'selected' if lead and lead.origem == 'olx' else '' }}>OLX</option>
+                <option value="zap" {{ 'selected' if lead and lead.origem == 'zap' else '' }}>Zap Imóveis</option>
+                <option value="mercadolivre" {{ 'selected' if lead and lead.origem == 'mercadolivre' else '' }}>Mercado Livre</option>
+                <option value="indicacao" {{ 'selected' if lead and lead.origem == 'indicacao' else '' }}>Indicação</option>
+                <option value="redes_sociais" {{ 'selected' if lead and lead.origem == 'redes_sociais' else '' }}>Redes Sociais</option>
+                <option value="site" {{ 'selected' if lead and lead.origem == 'site' else '' }}>Site</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="novo" {{ 'selected' if (not lead) or (lead and lead.status == 'novo') else '' }}>Novo</option>
+                <option value="em_contato" {{ 'selected' if lead and lead.status == 'em_contato' else '' }}>Em Contato</option>
+                <option value="visita_agendada" {{ 'selected' if lead and lead.status == 'visita_agendada' else '' }}>Visita Agendada</option>
+                <option value="proposta" {{ 'selected' if lead and lead.status == 'proposta' else '' }}>Proposta</option>
+                <option value="negociacao" {{ 'selected' if lead and lead.status == 'negociacao' else '' }}>Negociação</option>
+                <option value="fechado" {{ 'selected' if lead and lead.status == 'fechado' else '' }}>Fechado</option>
+                <option value="perdido" {{ 'selected' if lead and lead.status == 'perdido' else '' }}>Perdido</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="interesse">Tipo de Interesse</label>
+            <select id="interesse" name="interesse">
+                <option value="">Selecione...</option>
+                <option value="comprar" {{ 'selected' if lead and lead.interesse == 'comprar' else '' }}>Comprar</option>
+                <option value="vender" {{ 'selected' if lead and lead.interesse == 'vender' else '' }}>Vender</option>
+                <option value="alugar" {{ 'selected' if lead and lead.interesse == 'alugar' else '' }}>Alugar</option>
+                <option value="investir" {{ 'selected' if lead and lead.interesse == 'investir' else '' }}>Investir</option>
+            </select>
+        </div>
+        
+        <div class="form-group full-width">
+            <label for="observacoes">Observações</label>
+            <textarea id="observacoes" name="observacoes" rows="4">{{ lead.observacoes if lead else '' }}</textarea>
+        </div>
+        
+        <div class="form-actions full-width">
+            <a href="{{ url_for('listar_leads') }}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

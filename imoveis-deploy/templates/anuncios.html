@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Anúncios Salvos{% endblock %}
+{% block header %}Anúncios Captados dos Portais{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Anúncios Salvos ({{ anuncios|length }})</h3>
+        <a href="{{ url_for('scrapers_page') }}" class="btn btn-primary">
+            <i class="fas fa-search"></i> Nova Busca
+        </a>
+    </div>
+    
+    {% if anuncios %}
+    <div class="imoveis-grid">
+        {% for anuncio in anuncios %}
+        <div class="imovel-card">
+            {% if anuncio.foto_url %}
+            <div class="imovel-foto">
+                <img src="{{ anuncio.foto_url }}" alt="{{ anuncio.titulo }}" loading="lazy" onerror="this.parentElement.style.display='none'">
+            </div>
+            {% else %}
+            <div class="imovel-foto imovel-foto-placeholder">
+                <i class="fas fa-home"></i>
+            </div>
+            {% endif %}
+            <div class="imovel-header">
+                <span class="portal-badge badge-{{ anuncio.portal.lower().split(' ')[0] if anuncio.portal else '' }}">{{ anuncio.portal }}</span>
+                {% if anuncio.convertido_lead_id %}
+                <span class="badge badge-fechado">Convertido</span>
+                {% endif %}
+            </div>
+            <h4>{{ anuncio.titulo }}</h4>
+            {% if anuncio.preco %}
+            <p class="imovel-preco">{{ anuncio.preco }}</p>
+            {% endif %}
+            {% if anuncio.endereco %}
+            <p class="imovel-endereco"><i class="fas fa-map-marker-alt"></i> {{ anuncio.endereco }}</p>
+            {% endif %}
+            {% if anuncio.telefone %}
+            <p class="imovel-telefone"><i class="fas fa-phone"></i> {{ anuncio.telefone }}</p>
+            {% endif %}
+            <p class="text-muted" style="font-size: 0.8rem;">Importado em: {{ anuncio.importado_em.strftime('%d/%m/%Y') }}</p>
+            <div class="imovel-actions">
+                {% if anuncio.url %}
+                <a href="{{ anuncio.url }}" target="_blank" class="btn btn-sm btn-info">
+                    <i class="fas fa-external-link-alt"></i> Ver
+                </a>
+                {% endif %}
+                {% if not anuncio.convertido_lead_id %}
+                <form action="{{ url_for('converter_anuncio_lead', id=anuncio.id) }}" method="POST" class="inline-form">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fas fa-user-plus"></i> Lead
+                    </button>
+                </form>
+                {% else %}
+                <a href="{{ url_for('ver_lead', id=anuncio.convertido_lead_id) }}" class="btn btn-sm btn-success">
+                    <i class="fas fa-user-check"></i> Ver Lead
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">Nenhum anúncio capturado. <a href="{{ url_for('scrapers_page') }}">Faça uma busca!</a></p>
+    {% endif %}
+</div>
+{% endblock %}

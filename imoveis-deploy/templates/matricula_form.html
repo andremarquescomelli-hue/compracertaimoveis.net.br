@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block header %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <form method="POST" class="form-grid">
+        <div class="form-group full-width">
+            <label for="imovel_endereco">Endereço do Imóvel *</label>
+            <input type="text" id="imovel_endereco" name="imovel_endereco" value="{{ matricula.imovel_endereco if matricula else '' }}" required placeholder="Rua, número, bairro, cidade - UF">
+        </div>
+        
+        <div class="form-group">
+            <label for="cartorio">Cartório</label>
+            <input type="text" id="cartorio" name="cartorio" value="{{ matricula.cartorio if matricula else '' }}" placeholder="Nome do cartório">
+        </div>
+        
+        <div class="form-group">
+            <label for="numero_matricula">Nº da Matrícula</label>
+            <input type="text" id="numero_matricula" name="numero_matricula" value="{{ matricula.numero_matricula if matricula else '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="proprietario_nome">Nome do Proprietário</label>
+            <input type="text" id="proprietario_nome" name="proprietario_nome" value="{{ matricula.proprietario_nome if matricula else '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="proprietario_contato">Contato do Proprietário</label>
+            <input type="text" id="proprietario_contato" name="proprietario_contato" value="{{ matricula.proprietario_contato if matricula else '' }}" placeholder="Telefone ou email">
+        </div>
+        
+        <div class="form-group">
+            <label for="area">Área</label>
+            <input type="text" id="area" name="area" value="{{ matricula.area if matricula else '' }}" placeholder="Ex: 120m²">
+        </div>
+        
+        <div class="form-group">
+            <label for="valor">Valor Estimado</label>
+            <input type="text" id="valor" name="valor" value="{{ matricula.valor if matricula else '' }}" placeholder="R$ 000.000,00">
+        </div>
+        
+        <div class="form-group">
+            <label for="situacao">Situação</label>
+            <select id="situacao" name="situacao">
+                <option value="pendente" {{ 'selected' if (not matricula) or (matricula and matricula.situacao == 'pendente') else '' }}>Pendente</option>
+                <option value="em_andamento" {{ 'selected' if matricula and matricula.situacao == 'em_andamento' else '' }}>Em Andamento</option>
+                <option value="concluida" {{ 'selected' if matricula and matricula.situacao == 'concluida' else '' }}>Concluída</option>
+                <option value="negado" {{ 'selected' if matricula and matricula.situacao == 'negado' else '' }}>Negado</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="followup_data">Data de Follow-up</label>
+            <input type="date" id="followup_data" name="followup_data" value="{{ matricula.followup_data.strftime('%Y-%m-%d') if matricula and matricula.followup_data else '' }}">
+        </div>
+        
+        <div class="form-group full-width">
+            <label for="observacoes">Observações</label>
+            <textarea id="observacoes" name="observacoes" rows="3">{{ matricula.observacoes if matricula else '' }}</textarea>
+        </div>
+        
+        <div class="form-group full-width">
+            <label for="documentos">Documentos/Links</label>
+            <textarea id="documentos" name="documentos" rows="2" placeholder="URLs de documentos, links para PDFs, etc.">{{ matricula.documentos if matricula else '' }}</textarea>
+        </div>
+        
+        <div class="form-actions full-width">
+            <a href="{{ url_for('listar_matriculas') }}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

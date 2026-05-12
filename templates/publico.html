@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra Certa Imóveis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { margin:0; padding:0; background:white !important; }
+        .topo { text-align:center; padding:30px 20px 0; background:white; }
+        .topo img { width:100%; max-width:900px; height:auto; display:block; margin:0 auto; }
+        .contato { text-align:center; padding:5px 20px 10px; background:white; border-bottom:1px solid #eee; margin-top:0; }
+        .telefone-azul { 
+            color: #007bff; 
+            font-size: 1.4rem; 
+            font-weight: bold; 
+            text-decoration: none;
+            display: block;
+            margin: -40px 0 1px 0;
+            font-family: Arial;
+        }
+        .cidade { color:#333; font-size:1.1rem; font-family:Arial; margin:1px 0; }
+        .botoes { margin-top:15px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+        .botoes a {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-family: Arial;
+        }
+        .whats { background:#25d366; color:white; }
+        .site-share { background:#007bff; color:white; }
+        .adm { background:#f0f0f0; color:#555; border:1px solid #ddd; }
+        .fale-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #25d366;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            font-family: Arial;
+            margin-top: 15px;
+        }
+        .conteudo { max-width:1200px; margin:40px auto; padding:0 20px; background:white; font-family:Arial; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:25px; margin-top:30px; }
+        .card { border:1px solid #eee; border-radius:10px; overflow:hidden; background:white; cursor:pointer; }
+        .card img { width:100%; height:200px; object-fit:cover; }
+        .card-info { padding:15px; }
+        .card-info h3 { margin:0 0 10px 0; color:#333; }
+        .card-info p { color:#666; margin:5px 0; }
+        .detalhes { color:#666; font-size:0.9rem; margin:10px 0; display:flex; gap:15px; flex-wrap:wrap; }
+        .preco { color:#007bff; font-size:1.4rem; font-weight:bold; margin-top:10px; }
+        .card-botoes { display:flex; gap:10px; margin-top:10px; }
+        .card-botoes a {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-family: Arial;
+        }
+        .compartilhar-btn { background:#25d366; color:white; border:none; cursor:pointer; }
+        .fale-card { background:#007bff; color:white; }
+        #lightbox {
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0,0,0,0.9);
+            z-index:9999;
+            justify-content:center;
+            align-items:center;
+        }
+        #lightbox img { max-width:90%; max-height:90%; border-radius:8px; }
+        .fechar { position:absolute; top:20px; right:20px; background:transparent; color:white; border:none; font-size:2rem; cursor:pointer; }
+        .nav { position:absolute; top:50%; transform:translateY(-50%); background:transparent; color:white; border:none; font-size:2.5rem; padding:20px; cursor:pointer; }
+        .nav.ant { left:20px; }
+        .nav.prox { right:20px; }
+        .voltar-topo {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        .voltar-topo:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="topo">
+        <img src="{{ url_for('static', filename='logo.png') }}?v=4" alt="Compra Certa Imóveis">
+    </div>
+    <div class="contato">
+        <a href="tel:+5518997628360" class="telefone-azul">
+            <i class="fas fa-phone"></i> (18) 99762-8360
+        </a>
+        <p class="cidade"><i class="fas fa-map-marker-alt"></i> Assis-SP</p>
+        <div class="botoes">
+            <a href="https://wa.me/5518997628360" target="_blank" class="whats">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+            <a href="#" class="site-share" onclick="compartilharSite(); return false;">
+                <i class="fas fa-share-alt"></i> Compartilhar Site
+            </a>
+            <a href="{{ url_for('login') }}" class="adm">
+                <i class="fas fa-user-shield"></i> Admin
+            </a>
+        </div>
+    </div>
+    <div class="conteudo">
+        <h2 style="text-align:center; color:#333;">Imóveis Disponíveis</h2>
+        {% if imoveis %}
+        <div class="grid">
+            {% for imovel in imoveis %}
+            {% set fotos = fotos_por_imovel.get(imovel.id, []) %}
+            <div class="card" onclick="abrirFoto('{{ imovel.id }}', 0)">
+                {% if imovel.foto_capa %}
+                <img src="{{ imovel.foto_capa }}" alt="{{ imovel.titulo }}">
+                {% elif fotos %}
+                <img src="{{ fotos[0].caminho }}" alt="{{ imovel.titulo }}">
+                {% else %}
+                <div style="width:100%; height:200px; background:#f5f5f5; display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-home" style="font-size:3rem; color:#ddd;"></i>
+                </div>
+                {% endif %}
+                <div class="card-info">
+                    <h3>{{ imovel.titulo }}</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> {{ imovel.bairro or 'Bairro não informado' }}</p>
+                    <div class="detalhes">
+                        {% if imovel.area %}<span><i class="fas fa-ruler-combined"></i> {{ imovel.area }}m²</span>{% endif %}
+                        {% if imovel.quartos %}<span><i class="fas fa-bed"></i> {{ imovel.quartos }} quartos</span>{% endif %}
+                        {% if imovel.banheiros %}<span><i class="fas fa-bath"></i> {{ imovel.banheiros }}</span>{% endif %}
+                        {% if imovel.vagas %}<span><i class="fas fa-car"></i> {{ imovel.vagas }} vagas</span>{% endif %}
+                    </div>
+                    <div class="preco">
+                        {% if imovel.preco %}R$ {{ imovel.preco }}{% else %}Consulte{% endif %}
+                    </div>
+                    <div class="card-botoes">
+                        <a href="#" class="compartilhar-btn" onclick="event.stopPropagation(); compartilharWhats('{{ imovel.titulo }}', '{{ imovel.bairro or 'Bairro não informado' }}', '{{ imovel.id }}'); return false;">
+                            <i class="fab fa-whatsapp"></i> Compartilhar no WhatsApp
+                        </a>
+                        <a href="https://wa.me/5518997628360?text=Olá! Tenho interesse no imóvel: {{ imovel.titulo }} - {{ imovel.bairro or 'Bairro não informado' }}." target="_blank" class="fale-card" onclick="event.stopPropagation();">
+                            <i class="fas fa-comment-dots"></i> Fale Conosco
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align:center; color:#999; padding:60px;">Nenhum imóvel disponível no momento.</p>
+        {% endif %}
+    </div>
+    <div id="lightbox" onclick="if(event.target===this) fecharFoto()">
+        <button class="nav ant" onclick="event.stopPropagation(); navegar(-1)"><i class="fas fa-chevron-left"></i></button>
+        <img id="lightboxImg" src="" alt="">
+        <button class="nav prox" onclick="event.stopPropagation(); navegar(1)"><i class="fas fa-chevron-right"></i></button>
+        <button class="fechar" onclick="fecharFoto()"><i class="fas fa-times"></i></button>
+    </div>
+    <button class="voltar-topo" id="btnTopo" onclick="window.scrollTo({top:0, behavior:'smooth'});">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+    <script>
+        window.onscroll = function() {
+            document.getElementById('btnTopo').style.display = window.scrollY > 300 ? 'block' : 'none';
+        };
+        const fotosImoveis = {
+            {% for imovel in imoveis %}
+            "{{ imovel.id }}": [
+                {% for foto in fotos_por_imovel.get(imovel.id, []) %}
+                "{{ foto.caminho }}",
+                {% endfor %}
+                {% if imovel.foto_capa and not fotos_por_imovel.get(imovel.id) %}"{{ imovel.foto_capa }}"{% endif %}
+            ],
+            {% endfor %}
+        };
+        let idAtual = null, idxAtual = 0;
+        function abrirFoto(id, idx) {
+            idAtual = String(id); idxAtual = idx || 0;
+            const fotos = fotosImoveis[idAtual];
+            if(!fotos || !fotos.length) return;
+            document.getElementById('lightboxImg').src = fotos[idxAtual];
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+        function fecharFoto() { document.getElementById('lightbox').style.display = 'none'; }
+        function navegar(dir) {
+            const fotos = fotosImoveis[idAtual];
+            if(!fotos || !fotos.length) return;
+            idxAtual += dir;
+            if(idxAtual < 0) idxAtual = fotos.length-1;
+            if(idxAtual >= fotos.length) idxAtual = 0;
+            document.getElementById('lightboxImg').src = fotos[idxAtual];
+        }
+        document.addEventListener('keydown', e => {
+            if(document.getElementById('lightbox').style.display === 'flex') {
+                if(e.key === 'Escape') fecharFoto();
+                if(e.key === 'ArrowLeft') navegar(-1);
+                if(e.key === 'ArrowRight') navegar(1);
+            }
+        });
+        function compartilharWhats(titulo, bairro, id) {
+            const texto = `Confira este imóvel: ${titulo} - ${bairro}. Mais info: https://compracertaimoveis.net.br`;
+            const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+        }
+        function compartilharSite() {
+            const texto = 'Confira os imóveis da Compra Certa Imóveis! Telefone: (18) 99762-8360. Site: https://compracertaimoveis.net.br';
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Compra Certa Imóveis',
+                    text: texto,
+                    url: 'https://compracertaimoveis.net.br'
+                });
+            } else {
+                const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+                window.open(url, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>

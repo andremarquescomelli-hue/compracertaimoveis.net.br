@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra Certa Imóveis - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            background: var(--bg);
+        }
+        .login-header {
+            background: var(--text);
+            color: var(--white);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .login-header-logo { text-align: center; }
+        .login-header-logo img { max-width: 400px; height: auto; display: block; margin: 0 auto 10px; }
+        .login-header-contato { color: var(--white); font-size: 1rem; line-height: 1.8; }
+        .login-header-contato p { margin: 5px 0; }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 140px);
+            padding: 30px;
+        }
+        .login-box {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-box h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text);
+            font-size: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-login:hover { background: var(--primary-dark); }
+        .visitor-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px;
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .visitor-link:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+        .visitor-link i { margin-right: 6px; }
+        .flash {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .flash-error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="login-header">
+        <div class="login-header-logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Compra Certa Imóveis">
+            <div class="login-header-contato">
+                <p><i class="fas fa-phone"></i> (18) 99762-8360</p>
+                <p><i class="fas fa-map-marker-alt"></i> Assis-SP</p>
+            </div>
+        </div>
+        <a href="https://wa.me/5518997628360" target="_blank" class="contact-phone">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+    </div>
+
+    <div class="login-container">
+        <div class="login-box">
+            <h3><i class="fas fa-lock"></i> Login Administrativo</h3>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <input type="password" name="senha" placeholder="Digite a senha de acesso" required autofocus>
+                </div>
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Entrar no CRM
+                </button>
+            </form>
+
+            <a href="{{ url_for('imoveis_publico') }}" class="visitor-link">
+                <i class="fas fa-eye"></i> Entrar como Visitante
+            </a>
+        </div>
+    </div>
+</body>
+</html>

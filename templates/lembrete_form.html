@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar' if lembrete else 'Novo' }} Lembrete de Visita{% endblock %}
+{% block header %}{{ 'Editar' if lembrete else 'Novo' }} Lembrete de Visita{% endblock %}
+
+{% block content %}
+<style>
+    .form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
+    .form-row .form-group { flex: 1; min-width: 200px; }
+    @media (max-width: 768px) {
+        .form-row .form-group { flex: 100%; }
+    }
+    input[type="date"], input[type="time"] {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        background: white;
+    }
+    input[type="date"]:focus, input[type="time"]:focus {
+        border-color: var(--primary);
+        outline: none;
+    }
+</style>
+
+<div class="card">
+    <form method="POST">
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label for="titulo"><i class="fas fa-tag"></i> Título *</label>
+                <input type="text" id="titulo" name="titulo" value="{{ lembrete.titulo if lembrete else '' }}" required placeholder="Ex: Visitar imóvel com cliente">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cliente_nome"><i class="fas fa-user"></i> Nome do Cliente</label>
+                    <input type="text" id="cliente_nome" name="cliente_nome" value="{{ lembrete.cliente_nome if lembrete else '' }}" placeholder="Nome completo">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cliente_telefone"><i class="fas fa-phone"></i> Telefone do Cliente</label>
+                    <input type="text" id="cliente_telefone" name="cliente_telefone" value="{{ lembrete.cliente_telefone if lembrete else '' }}" placeholder="(00) 00000-0000">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="corretor_nome"><i class="fas fa-user-tie"></i> Nome do Corretor</label>
+                    <input type="text" id="corretor_nome" name="corretor_nome" value="{{ lembrete.corretor_nome if lembrete else 'Andre Comelli' }}" placeholder="Nome do corretor">
+                </div>
+                
+                <div class="form-group">
+                    <label for="corretor_telefone"><i class="fas fa-phone-square"></i> Telefone do Corretor</label>
+                    <input type="text" id="corretor_telefone" name="corretor_telefone" value="{{ lembrete.corretor_telefone if lembrete else '(18) 99762-8360' }}" placeholder="(00) 00000-0000">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="imovel_id"><i class="fas fa-home"></i> Imóvel</label>
+                    <select id="imovel_id" name="imovel_id">
+                        <option value="">Selecione...</option>
+                        {% for imovel in imoveis %}
+                        <option value="{{ imovel.id }}" {{ 'selected' if lembrete and lembrete.imovel_id == imovel.id else '' }}>
+                            {{ imovel.titulo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="local"><i class="fas fa-map-marker-alt"></i> Local da Visita</label>
+                    <input type="text" id="local" name="local" value="{{ lembrete.local if lembrete else '' }}" placeholder="Endereço ou ponto de encontro">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="data_visita"><i class="fas fa-calendar"></i> Data da Visita *</label>
+                    <input type="date" id="data_visita" name="data_visita" value="{{ lembrete.data_visita.strftime('%Y-%m-%d') if lembrete else '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="hora_visita"><i class="fas fa-clock"></i> Hora da Visita *</label>
+                    <input type="time" id="hora_visita" name="hora_visita" value="{{ lembrete.data_visita.strftime('%H:%M') if lembrete else '' }}" required>
+                </div>
+            </div>
+            
+            <div class="form-group full-width">
+                <label for="observacoes"><i class="fas fa-sticky-note"></i> Observações</label>
+                <textarea id="observacoes" name="observacoes" rows="3" placeholder="Anotações sobre a visita...">{{ lembrete.observacoes if lembrete else '' }}</textarea>
+            </div>
+            
+            <div class="form-actions full-width">
+                <a href="{{ url_for('listar_lembretes') }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Lembrete
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

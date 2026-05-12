@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block header %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <a href="{{ url_for('listar_leads') }}" class="stat-card stat-blue">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+            <h3>{{ total_leads }}</h3>
+            <p>Total de Leads</p>
+        </div>
+    </a>
+    <a href="{{ url_for('listar_imoveis') }}" class="stat-card stat-green">
+        <div class="stat-icon"><i class="fas fa-home"></i></div>
+        <div class="stat-info">
+            <h3>{{ total_imoveis }}</h3>
+            <p>Imóveis Cadastrados</p>
+        </div>
+    </a>
+    <a href="{{ url_for('listar_matriculas') }}" class="stat-card stat-orange">
+        <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="stat-info">
+            <h3>{{ matriculas_pendentes }}</h3>
+            <p>Matrículas Pendentes</p>
+        </div>
+    </a>
+    <a href="{{ url_for('listar_anuncios') }}" class="stat-card stat-purple">
+        <div class="stat-icon"><i class="fas fa-globe"></i></div>
+        <div class="stat-info">
+            <h3>{{ total_anuncios }}</h3>
+            <p>Anúncios Captados</p>
+        </div>
+    </a>
+</div>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <h2><i class="fas fa-clock"></i> Últimos Leads</h2>
+        {% if ultimos_leads %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in ultimos_leads %}
+                <tr>
+                    <td><a href="{{ url_for('ver_lead', id=lead.id) }}">{{ lead.nome }}</a></td>
+                    <td>{{ lead.telefone }}</td>
+                    <td><span class="badge badge-{{ lead.status }}">{{ lead.status }}</span></td>
+                    <td>{{ lead.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">Nenhum lead cadastrado ainda.</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2><i class="fas fa-bolt"></i> Ações Rápidas</h2>
+        <div class="quick-actions">
+            <a href="{{ url_for('novo_lead') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Cadastrar Lead
+            </a>
+            <a href="{{ url_for('nova_matricula') }}" class="btn btn-secondary">
+                <i class="fas fa-plus-circle"></i> Nova Matrícula
+            </a>
+            <a href="{{ url_for('scrapers_page') }}" class="btn btn-accent">
+                <i class="fas fa-search"></i> Buscar Imóveis
+            </a>
+            <a href="{{ url_for('listar_anuncios') }}" class="btn btn-info">
+                <i class="fas fa-list"></i> Ver Anúncios
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

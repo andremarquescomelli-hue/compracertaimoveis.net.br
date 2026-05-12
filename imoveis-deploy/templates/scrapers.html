@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar Imóveis{% endblock %}
+{% block header %}Buscar Imóveis nos Portais{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2><i class="fas fa-search"></i> Buscar Imóveis - Assis-SP</h2>
+    <p class="text-muted">Busque imóveis nos principais portais e converta anúncios em leads.</p>
+    
+    <form action="{{ url_for('scraper_buscar') }}" method="POST" class="form-vertical">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="cidade">Cidade *</label>
+                <input type="text" id="cidade" name="cidade" value="Assis-SP" required placeholder="Ex: São Paulo">
+            </div>
+            
+            <div class="form-group">
+                <label for="tipo">Tipo de Negócio</label>
+                <select id="tipo" name="tipo">
+                    <option value="venda">Venda</option>
+                    <option value="aluguel">Aluguel</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Portais</label>
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="portais" value="olx" checked>
+                    <span><i class="fas fa-circle"></i> OLX</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="portais" value="zap" checked>
+                    <span><i class="fas fa-circle"></i> Zap Imóveis</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="portais" value="mercadolivre" checked>
+                    <span><i class="fas fa-circle"></i> Mercado Livre</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Buscar Imóveis
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2><i class="fab fa-facebook" style="color: #1877F2;"></i> Facebook Marketplace - Assis-SP</h2>
+    <p class="text-muted">O Facebook Marketplace não permite busca automática. Clique nos links abaixo para buscar manualmente:</p>
+    
+    <div class="facebook-links">
+        <a href="https://www.facebook.com/marketplace/assisbr/property-sales" target="_blank" class="fb-link">
+            <i class="fab fa-facebook"></i>
+            <div>
+                <strong>Imóveis à Venda</strong>
+                <span>Assis-SP</span>
+            </div>
+        </a>
+        <a href="https://www.facebook.com/marketplace/assisbr/property-rentals" target="_blank" class="fb-link">
+            <i class="fab fa-facebook"></i>
+            <div>
+                <strong>Imóveis para Aluguel</strong>
+                <span>Assis-SP</span>
+            </div>
+        </a>
+        <a href="https://www.facebook.com/search/posts?q=imovel%20direto%20proprietario%20assis%20sp" target="_blank" class="fb-link">
+            <i class="fab fa-facebook"></i>
+            <div>
+                <strong>Direto com Proprietário</strong>
+                <span>Posts em grupos</span>
+            </div>
+        </a>
+        <a href="https://www.facebook.com/search/groups?q=imoveis%20assis%20sp" target="_blank" class="fb-link">
+            <i class="fab fa-facebook"></i>
+            <div>
+                <strong>Grupos de Imóveis</strong>
+                <span>Assis-SP</span>
+            </div>
+        </a>
+    </div>
+    
+    <div class="info-box" style="margin-top: 20px;">
+        <p><strong>Dica:</strong> No Facebook, procure por anúncios com:</p>
+        <ul>
+            <li>"Direto com proprietário"</li>
+            <li>"Sem imobiliária"</li>
+            <li>"Particular"</li>
+            <li>Fotos caseiras (geralmente são do próprio dono)</li>
+        </ul>
+        <p>Quando encontrar, clique em <strong>"Enviar mensagem"</strong> ou copie os dados e adicione como Lead no CRM.</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2><i class="fas fa-info-circle"></i> Sobre a Busca</h2>
+    <div class="info-box">
+        <p><strong>Como funciona:</strong></p>
+        <ul>
+            <li>O sistema busca imóveis nos portais selecionados</li>
+            <li>Os resultados são salvos na aba "Anúncios Salvos"</li>
+            <li>Para cada anúncio, você pode converter em Lead para acompanhamento</li>
+            <li>O telefone do anunciante é capturado quando disponível</li>
+        </ul>
+        <p class="text-muted"><strong>Nota:</strong> Alguns portais podem limitar o acesso automatizado. Os resultados podem variar conforme a disponibilidade do site.</p>
+    </div>
+</div>
+{% endblock %}

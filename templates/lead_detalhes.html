@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lead.nome }}{% endblock %}
+{% block header %}{{ lead.nome }}{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div class="card">
+        <h2><i class="fas fa-user"></i> Dados do Lead</h2>
+        <div class="detail-info">
+            <div class="info-row">
+                <span class="label">Telefone:</span>
+                <span class="value">
+                    {{ lead.telefone }}
+                    {% if lead.telefone %}
+                    <a href="{{ url_for('whatsapp_lead', id=lead.id) }}" class="btn btn-sm btn-success" target="_blank">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="label">Email:</span>
+                <span class="value">{{ lead.email or '-' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Origem:</span>
+                <span class="value">{{ lead.origem }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Status:</span>
+                <span class="value"><span class="badge badge-{{ lead.status }}">{{ lead.status }}</span></span>
+            </div>
+            <div class="info-row">
+                <span class="label">Interesse:</span>
+                <span class="value">{{ lead.interesse or '-' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Cadastrado em:</span>
+                <span class="value">{{ lead.criado_em.strftime('%d/%m/%Y %H:%M') }}</span>
+            </div>
+            {% if lead.observacoes %}
+            <div class="info-row">
+                <span class="label">Observações:</span>
+                <span class="value">{{ lead.observacoes }}</span>
+            </div>
+            {% endif %}
+        </div>
+        <div class="detail-actions">
+            <a href="{{ url_for('editar_lead', id=lead.id) }}" class="btn btn-secondary">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{{ url_for('enriquecer_lead', id=lead.id) }}" class="btn btn-accent">
+                <i class="fas fa-search"></i> Buscar Contato
+            </a>
+            {% if lead.telefone %}
+            <a href="{{ url_for('whatsapp_lead', id=lead.id) }}" class="btn btn-success" target="_blank">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+            {% endif %}
+            <form action="{{ url_for('excluir_lead', id=lead.id) }}" method="POST" class="inline-form">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Tem certeza?')">
+                    <i class="fas fa-trash"></i> Excluir
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2><i class="fas fa-comments"></i> Registrar Interação</h2>
+        <form action="{{ url_for('registrar_interacao', id=lead.id) }}" method="POST" class="form-vertical">
+            <div class="form-group">
+                <label for="tipo">Tipo</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="ligacao">Ligação</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="email">Email</option>
+                    <option value="visita">Visita</option>
+                    <option value="reuniao">Reunião</option>
+                    <option value="outro">Outro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Registrar</button>
+        </form>
+    </div>
+</div>
+
+<div class="card full-width">
+    <h2><i class="fas fa-history"></i> Histórico de Interações</h2>
+    {% if interacoes %}
+    <div class="timeline">
+        {% for interacao in interacoes %}
+        <div class="timeline-item">
+            <div class="timeline-icon">
+                {% if interacao.tipo == 'ligacao' %}<i class="fas fa-phone"></i>
+                {% elif interacao.tipo == 'whatsapp' %}<i class="fab fa-whatsapp"></i>
+                {% elif interacao.tipo == 'email' %}<i class="fas fa-envelope"></i>
+                {% elif interacao.tipo == 'visita' %}<i class="fas fa-home"></i>
+                {% elif interacao.tipo == 'reuniao' %}<i class="fas fa-handshake"></i>
+                {% else %}<i class="fas fa-comment"></i>{% endif %}
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-header">
+                    <span class="timeline-type">{{ interacao.tipo }}</span>
+                    <span class="timeline-date">{{ interacao.data.strftime('%d/%m/%Y %H:%M') }}</span>
+                </div>
+                {% if interacao.descricao %}
+                <p>{{ interacao.descricao }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">Nenhuma interação registrada.</p>
+    {% endif %}
+</div>
+{% endblock %}

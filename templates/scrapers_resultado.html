@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados da Busca{% endblock %}
+{% block header %}Resultados - {{ cidade }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Imóveis Encontrados ({{ resultados|length }})</h3>
+        <a href="{{ url_for('scrapers_page') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Nova Busca
+        </a>
+    </div>
+    
+    {% if resultados %}
+    <div class="imoveis-grid">
+        {% for imovel in resultados %}
+        <div class="imovel-card">
+            {% if imovel.foto_url %}
+            <div class="imovel-foto">
+                <img src="{{ imovel.foto_url }}" alt="{{ imovel.titulo }}" loading="lazy" onerror="this.parentElement.style.display='none'">
+            </div>
+            {% endif %}
+            <div class="imovel-header">
+                <span class="portal-badge badge-{{ imovel.portal.lower().split(' ')[0] if imovel.portal else '' }}">{{ imovel.portal }}</span>
+            </div>
+            <h4>{{ imovel.titulo }}</h4>
+            {% if imovel.preco %}
+            <p class="imovel-preco">{{ imovel.preco }}</p>
+            {% endif %}
+            {% if imovel.endereco %}
+            <p class="imovel-endereco"><i class="fas fa-map-marker-alt"></i> {{ imovel.endereco }}</p>
+            {% endif %}
+            {% if imovel.area or imovel.quartos %}
+            <div class="imovel-details">
+                {% if imovel.area %}<span><i class="fas fa-ruler-combined"></i> {{ imovel.area }}</span>{% endif %}
+                {% if imovel.quartos %}<span><i class="fas fa-bed"></i> {{ imovel.quartos }} quartos</span>{% endif %}
+            </div>
+            {% endif %}
+            {% if imovel.telefone %}
+            <p class="imovel-telefone"><i class="fas fa-phone"></i> {{ imovel.telefone }}</p>
+            {% endif %}
+            <div class="imovel-actions">
+                {% if imovel.url %}
+                <a href="{{ imovel.url }}" target="_blank" class="btn btn-sm btn-info">
+                    <i class="fas fa-external-link-alt"></i> Ver no Portal
+                </a>
+                {% endif %}
+                <form action="{{ url_for('converter_anuncio_lead') }}" method="POST" class="inline-form" style="display: none;">
+                    <input type="hidden" name="titulo" value="{{ imovel.titulo }}">
+                    <input type="hidden" name="portal" value="{{ imovel.portal }}">
+                    <input type="hidden" name="telefone" value="{{ imovel.telefone }}">
+                    <input type="hidden" name="endereco" value="{{ imovel.endereco }}">
+                    <input type="hidden" name="preco" value="{{ imovel.preco }}">
+                    <input type="hidden" name="url" value="{{ imovel.url }}">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fas fa-user-plus"></i> Converter em Lead
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <p class="text-muted" style="margin-top: 20px;">
+        Resultados salvos automaticamente. Acesse <a href="{{ url_for('listar_anuncios') }}">Anúncios Salvos</a> para converter em leads.
+    </p>
+    {% else %}
+    <p class="empty-state">Nenhum imóvel encontrado para esta busca.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Bot de Comandos{% endblock %}
+{% block header %}🤖 Bot de Comandos WhatsApp{% endblock %}
+
+{% block content %}
+<style>
+    .comando-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .comando-input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+    .comando-input:focus {
+        border-color: var(--primary);
+        outline: none;
+    }
+    .comando-btn {
+        background: #25d366;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .comando-btn:hover {
+        background: #1da851;
+    }
+    .resposta {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        white-space: pre-wrap;
+        font-family: monospace;
+    }
+    .comandos-lista {
+        background: #f0f8ff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+    .comandos-lista h3 {
+        margin-top: 0;
+        color: var(--primary);
+    }
+    .comando-exemplo {
+        background: #e8f4e8;
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin: 5px 0;
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="comando-card">
+    <h2>💬 Enviar Comando</h2>
+    <p>Digite um comando para atualizar o site via WhatsApp:</p>
+    
+    <input type="text" id="comando" class="comando-input" placeholder="Ex: cadastrar cliente: Maria Silva | (18) 99999-8888 | Centro">
+    
+    <button onclick="enviarComando()" class="comando-btn">
+        <i class="fab fa-whatsapp"></i> Enviar via WhatsApp
+    </button>
+</div>
+
+<div id="resposta" style="display:none;" class="resposta">
+    <strong>Resposta:</strong>
+    <pre id="resposta-texto"></pre>
+</div>
+
+<div class="comandos-lista">
+    <h3>📋 Comandos Disponíveis:</h3>
+    
+    <h4>📝 Cadastrar Cliente:</h4>
+    <div class="comando-exemplo">cadastrar cliente: NOME | TELEFONE | BAIRRO</div>
+    <div class="comando-exemplo">Ex: cadastrar cliente: João Silva | (18) 99999-9999 | Centro</div>
+    
+    <h4>🏠 Cadastrar Imóvel:</h4>
+    <div class="comando-exemplo">cadastrar imovel: TITULO | ENDEREÇO | PREÇO</div>
+    <div class="comando-exemplo">Ex: cadastrar imovel: Casa 3q | Rua X | 350.000</div>
+    
+    <h4>📅 Criar Lembrete:</h4>
+    <div class="comando-exemplo">lembrete: TITULO | CLIENTE | DATA | HORA</div>
+    <div class="comando-exemplo">Ex: lembrete: Visitar casa | João | 15/05 | 14:00</div>
+    
+    <h4>👁️ Ver Informações:</h4>
+    <div class="comando-exemplo">ver clientes</div>
+    <div class="comando-exemplo">ver imoveis</div>
+    <div class="comando-exemplo">ver lembretes</div>
+    
+    <h4>❓ Ajuda:</h4>
+    <div class="comando-exemplo">ajuda</div>
+</div>
+
+<script>
+function enviarComando() {
+    var comando = document.getElementById('comando').value.trim();
+    if (!comando) {
+        alert('Digite um comando!');
+        return;
+    }
+    
+    var texto = encodeURIComponent(comando);
+    var url = 'https://web.whatsapp.com/send?phone=5518997628360&text=' + texto;
+    
+    // Abre WhatsApp
+    window.open(url, '_blank');
+    
+    // Clica automaticamente após 8 segundos
+    setTimeout(function() {
+        fetch('/api/enviar-comando', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({comando: comando})
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('resposta').style.display = 'block';
+            document.getElementById('resposta-texto').textContent = data.resposta;
+        })
+        .catch(err => {
+            document.getElementById('resposta').style.display = 'block';
+            document.getElementById('resposta-texto').textContent = 'Comando enviado! Abra o WhatsApp e envie a mensagem.';
+        });
+    }, 8000);
+}
+</script>
+{% endblock %}

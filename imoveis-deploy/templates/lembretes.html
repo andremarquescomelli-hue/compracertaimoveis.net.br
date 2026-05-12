@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Lembretes de Visita{% endblock %}
+{% block header %}Lembretes de Visita{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+    <a href="{{ url_for('novo_lembrete') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Novo Lembrete
+    </a>
+</div>
+
+<div class="card">
+    <div style="overflow-x: auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="min-width: 120px;"><i class="fas fa-calendar"></i> Data</th>
+                    <th style="min-width: 80px;"><i class="fas fa-clock"></i> Hora</th>
+                    <th style="min-width: 150px;"><i class="fas fa-tag"></i> Título</th>
+                    <th style="min-width: 120px;"><i class="fas fa-user"></i> Cliente</th>
+                    <th style="min-width: 120px;"><i class="fas fa-user-tie"></i> Corretor</th>
+                    <th style="min-width: 150px;"><i class="fas fa-home"></i> Imóvel</th>
+                    <th style="min-width: 100px;"><i class="fas fa-cog"></i> Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lembrete in lembretes %}
+                <tr>
+                    <td>
+                        <span style="font-weight: bold; color: var(--primary);">
+                            {{ lembrete.data_visita.strftime('%d/%m/%Y') }}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="background: var(--bg); padding: 4px 8px; border-radius: 4px; font-weight: bold;">
+                            {{ lembrete.data_visita.strftime('%H:%M') }}
+                        </span>
+                    </td>
+                    <td>{{ lembrete.titulo }}</td>
+                    <td>
+                        {{ lembrete.cliente_nome or '-' }}
+                        <br>
+                        <small style="color: var(--text-light);">{{ lembrete.cliente_telefone or '' }}</small>
+                    </td>
+                    <td>
+                        {{ lembrete.corretor_nome or 'Andre Comelli' }}
+                        <br>
+                        <small style="color: var(--primary);">{{ lembrete.corretor_telefone or '(18) 99762-8360' }}</small>
+                    </td>
+                    <td>
+                        {% if lembrete.imovel %}
+                            <span style="color: var(--primary);">{{ lembrete.imovel.titulo }}</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="font-weight: bold; color: var(--primary);">
+                            {{ lembrete.data_visita.strftime('%d/%m/%Y') }}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="background: var(--bg); padding: 4px 8px; border-radius: 4px; font-weight: bold;">
+                            {{ lembrete.data_visita.strftime('%H:%M') }}
+                        </span>
+                    </td>
+                    <td>{{ lembrete.titulo }}</td>
+                    <td>{{ lembrete.cliente_nome or '-' }}</td>
+                    <td>
+                        {{ lembrete.cliente_nome or '-' }}
+                        <br>
+                        <small style="color: var(--text-light);">{{ lembrete.cliente_telefone or '' }}</small>
+                    </td>
+                    <td>
+                        {{ lembrete.corretor_nome or 'Andre Comelli' }}
+                        <br>
+                        <small style="color: var(--primary);">{{ lembrete.corretor_telefone or '(18) 99762-8360' }}</small>
+                    </td>
+                    <td>
+                        {% if lembrete.imovel %}
+                            <span style="color: var(--primary);">{{ lembrete.imovel.titulo }}</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ lembrete.local or '-' }}</td>
+                    <td>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <a href="{{ url_for('whatsapp_lembrete', id=lembrete.id) }}" class="btn btn-sm" style="background: #25d366; color: white;" target="_blank" title="Enviar para Cliente">
+                                <i class="fab fa-whatsapp"></i> Cliente
+                            </a>
+                            <a href="{{ url_for('whatsapp_lembrete_proprio', id=lembrete.id) }}" class="btn btn-sm" style="background: #007bff; color: white;" target="_blank" title="Enviar para Mim">
+                                <i class="fas fa-bell"></i> Pra Mim
+                            </a>
+                            <a href="{{ url_for('editar_lembrete', id=lembrete.id) }}" class="btn btn-sm btn-secondary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('excluir_lembrete', id=lembrete.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Excluir lembrete?')" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-light);">
+                        <i class="fas fa-calendar-times" style="font-size: 3rem; margin-bottom: 10px; display: block;"></i>
+                        Nenhum lembrete cadastrado.
+                        <br>
+                        <a href="{{ url_for('novo_lembrete') }}" class="btn btn-primary" style="margin-top: 10px;">
+                            <i class="fas fa-plus"></i> Criar primeiro lembrete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .table { width: 100%; border-collapse: collapse; }
+    .table th { text-align: left; padding: 12px 8px; border-bottom: 2px solid var(--primary); color: var(--text); }
+    .table td { padding: 12px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+    .table tbody tr:hover { background: var(--bg); }
+</style>
+{% endblock %}

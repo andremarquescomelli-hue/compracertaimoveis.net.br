@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra Certa Imóveis - {% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Compra Certa Imóveis" style="max-width:200px; height:auto; display:block; margin:0 auto 10px;">
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a></li>
+            <li class="nav-section">Leads</li>
+            <li><a href="{{ url_for('listar_leads') }}" class="{% if 'lead' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-users"></i> Lista de Leads
+            </a></li>
+            <li><a href="{{ url_for('novo_lead') }}" class="{% if request.endpoint == 'novo_lead' %}active{% endif %}">
+                <i class="fas fa-user-plus"></i> Novo Lead
+            </a></li>
+            <li class="nav-section">Matrículas</li>
+            <li><a href="{{ url_for('listar_matriculas') }}" class="{% if 'matricula' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-file-alt"></i> Consultas
+            </a></li>
+            <li><a href="{{ url_for('nova_matricula') }}" class="{% if request.endpoint == 'nova_matricula' %}active{% endif %}">
+                <i class="fas fa-plus-circle"></i> Nova Matrícula
+            </a></li>
+            <li class="nav-section">Portais</li>
+            <li><a href="{{ url_for('scrapers_page') }}" class="{% if request.endpoint == 'scrapers_page' %}active{% endif %}">
+                <i class="fas fa-search"></i> Buscar Imóveis
+            </a></li>
+            <li><a href="{{ url_for('listar_anuncios') }}" class="{% if request.endpoint == 'listar_anuncios' %}active{% endif %}">
+                <i class="fas fa-list"></i> Anúncios Salvos
+            </a></li>
+            <li class="nav-section">Carteira</li>
+            <li><a href="{{ url_for('listar_imoveis') }}" class="{% if 'imovel' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-home"></i> Meus Imóveis
+            </a></li>
+            <li><a href="{{ url_for('novo_imovel') }}" class="{% if request.endpoint == 'novo_imovel' %}active{% endif %}">
+                <i class="fas fa-plus-circle"></i> Cadastrar Imóvel
+            </a></li>
+            <li class="nav-section">Agenda</li>
+            <li><a href="{{ url_for('listar_lembretes') }}" class="{% if 'lembrete' in request.endpoint and 'novo' not in request.endpoint and 'editar' not in request.endpoint %}active{% endif %}">
+                <i class="fas fa-calendar-check"></i> Lembretes de Visita
+            </a></li>
+            <li><a href="{{ url_for('pagina_avisos') }}" class="{% if request.endpoint == 'pagina_avisos' %}active{% endif %}">
+                <i class="fas fa-bell"></i> Avisos e Lembretes
+            </a></li>
+            <li><a href="{{ url_for('bot_comandos') }}" class="{% if request.endpoint == 'bot_comandos' %}active{% endif %}">
+                <i class="fas fa-robot"></i> Bot de Comandos
+            </a></li>
+        </ul>
+        {% if session.logado %}
+        <div class="sidebar-footer">
+            <a href="{{ url_for('logout') }}" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </a>
+        </div>
+        {% endif %}
+    </nav>
+
+    <main class="content">
+        <div class="top-bar" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px; margin-bottom:30px;">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Compra Certa Imóveis" style="max-height:45px; width:auto;">
+                <h1 style="margin:0; font-size:1.8rem;">{% block header %}Dashboard{% endblock %}</h1>
+            </div>
+            <div class="contact-options" style="display:flex; gap:10px;">
+                <a href="https://wa.me/5518997628360" target="_blank" class="contact-phone whatsapp" style="display:inline-flex; align-items:center; gap:8px; background:#25d366; color:white; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:600;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+                <a href="tel:+5518997628360" class="contact-phone phone-call" style="display:inline-flex; align-items:center; gap:8px; background:var(--primary); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:600;">
+                    <i class="fas fa-phone"></i> Ligar
+                </a>
+            </div>
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

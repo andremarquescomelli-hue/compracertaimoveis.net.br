@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar Contato - {{ matricula.proprietario_nome or 'Proprietário' }}{% endblock %}
+{% block header %}Buscar Contato do Proprietário{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2><i class="fas fa-search"></i> Buscar Proprietário: {{ matricula.proprietario_nome or 'Desconhecido' }}</h2>
+    <p class="text-muted">Busca o nome do proprietário em fontes públicas para encontrar contatos.</p>
+    
+    <form method="POST" class="form-vertical">
+        <div class="form-group">
+            <label for="nome_busca">Nome do proprietário</label>
+            <input type="text" id="nome_busca" name="nome_busca" value="{{ matricula.proprietario_nome }}" required>
+        </div>
+        <div class="form-group">
+            <label for="cidade_busca">Cidade</label>
+            <input type="text" id="cidade_busca" name="cidade_busca" value="Assis">
+        </div>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+    </form>
+</div>
+
+{% if resultados %}
+<div class="card">
+    <h2><i class="fas fa-list"></i> Resultados ({{ resultados|length }})</h2>
+    <div class="resultados-lista">
+        {% for r in resultados %}
+        <div class="resultado-item">
+            <span class="fonte-badge">{{ r.fonte }}</span>
+            <span class="resultado-tipo">{{ r.tipo }}</span>
+            <p class="resultado-texto">{{ r.titulo }}</p>
+            
+            {% if r.telefones_encontrados %}
+            <div class="telefones-encontrados">
+                {% for tel in r.telefones_encontrados %}
+                <span class="telefone-badge">
+                    <i class="fas fa-phone"></i> {{ tel }}
+                    <a href="https://api.whatsapp.com/send?phone=55{{ tel|replace('(', '')|replace(')', '')|replace(' ', '')|replace('-', '') }}&text=Olá, sou corretor em Assis-SP." target="_blank" class="whatsapp-mini">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if r.url %}
+            <a href="{{ r.url }}" target="_blank" class="btn btn-sm btn-info">
+                <i class="fas fa-external-link-alt"></i> Ver fonte
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% elif request.method == 'POST' %}
+<div class="card">
+    <p class="empty-state">
+        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: var(--warning);"></i>
+        Nenhum resultado encontrado para este proprietário.
+    </p>
+</div>
+{% endif %}
+
+<a href="{{ url_for('listar_matriculas') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Voltar
+</a>
+{% endblock %}

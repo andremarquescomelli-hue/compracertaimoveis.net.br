@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Avisos e Lembretes{% endblock %}
+{% block header %}📢 Avisos e Lembretes{% endblock %}
+
+{% block content %}
+<style>
+    .aviso-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--primary);
+    }
+    .aviso-card.urgente {
+        border-left-color: #dc3545;
+        background: #fff5f5;
+    }
+    .aviso-card.proximo {
+        border-left-color: #ffc107;
+        background: #fffef0;
+    }
+    .aviso-titulo {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: var(--text);
+    }
+    .aviso-info {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin: 5px 0;
+    }
+    .aviso-whatsapp {
+        display: inline-block;
+        background: #25d366;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+    .aviso-whatsapp:hover {
+        background: #1da851;
+    }
+    .nenhum-aviso {
+        text-align: center;
+        padding: 60px;
+        color: var(--text-light);
+    }
+    .badge-urgente {
+        background: #dc3545;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-left: 10px;
+    }
+    .badge-proximo {
+        background: #ffc107;
+        color: #333;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-left: 10px;
+    }
+    .refresh-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+    .refresh-btn:hover {
+        background: var(--primary-dark);
+    }
+</style>
+
+<div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <h2>Próximas Visitas</h2>
+    <div>
+        <a href="{{ url_for('novo_lembrete') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Lembrete
+        </a>
+    </div>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <button onclick="location.reload()" class="refresh-btn">
+        <i class="fas fa-sync-alt"></i> Atualizar Página
+    </button>
+    <span style="color: var(--text-light); margin-left: 10px;">
+        Atualizado em: {{ agora.strftime('%d/%m/%Y às %H:%M') }}
+    </span>
+</div>
+
+{% if lembretes_proximos %}
+    {% for lembrete in lembretes_proximos %}
+    <div class="aviso-card {% if lembrete.urgente %}urgente{% elif lembrete.proximo %}proximo{% endif %}">
+        <div class="aviso-titulo">
+            {{ lembrete.titulo }}
+            {% if lembrete.urgente %}
+                <span class="badge-urgente">🔥 URGENTE - Menos de 1 hora!</span>
+            {% elif lembrete.proximo %}
+                <span class="badge-proximo">⏰ Nas próximas 3 horas</span>
+            {% endif %}
+        </div>
+        
+        <div class="aviso-info">
+            <i class="fas fa-calendar"></i> <strong>{{ lembrete.data_visita.strftime('%d/%m/%Y') }}</strong>
+            às <strong>{{ lembrete.data_visita.strftime('%H:%M') }}</strong>
+        </div>
+        
+        {% if lembrete.cliente_nome %}
+        <div class="aviso-info">
+            <i class="fas fa-user"></i> Cliente: {{ lembrete.cliente_nome }}
+            {% if lembrete.cliente_telefone %}
+                - {{ lembrete.cliente_telefone }}
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if lembrete.imovel %}
+        <div class="aviso-info">
+            <i class="fas fa-home"></i> Imóvel: {{ lembrete.imovel.titulo }}
+        </div>
+        {% endif %}
+        
+        {% if lembrete.local %}
+        <div class="aviso-info">
+            <i class="fas fa-map-marker-alt"></i> Local: {{ lembrete.local }}
+        </div>
+        {% endif %}
+        
+        {% if lembrete.observacoes %}
+        <div class="aviso-info">
+            <i class="fas fa-sticky-note"></i> Obs: {{ lembrete.observacoes }}
+        </div>
+        {% endif %}
+        
+        <a href="{{ url_for('whatsapp_lembrete', id=lembrete.id) }}" class="aviso-whatsapp" target="_blank">
+            <i class="fab fa-whatsapp"></i> Enviar Lembrete no WhatsApp
+        </a>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="nenhum-aviso">
+        <i class="fas fa-calendar-check" style="font-size: 4rem; margin-bottom: 20px;"></i>
+        <h3>Nenhum lembrete nas próximas 24 horas</h3>
+        <p>Você pode criar um novo lembrete ou verificar a lista completa.</p>
+        <a href="{{ url_for('listar_lembretes') }}" class="btn btn-secondary" style="margin-top: 15px;">
+            <i class="fas fa-list"></i> Ver Todos os Lembretes
+        </a>
+    </div>
+{% endif %}
+
+<h3 style="margin-top: 30px; margin-bottom: 15px;">📋 Todos os Lembretes</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Data/Hora</th>
+            <th>Título</th>
+            <th>Cliente</th>
+            <th>Imóvel</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lembrete in todos_lembretes %}
+        <tr>
+            <td>
+                <span style="font-weight: bold; color: var(--primary);">
+                    {{ lembrete.data_visita.strftime('%d/%m/%Y') }}
+                </span>
+                <br>
+                <span style="color: var(--text-light);">
+                    {{ lembrete.data_visita.strftime('%H:%M') }}
+                </span>
+            </td>
+            <td>{{ lembrete.titulo }}</td>
+            <td>{{ lembrete.cliente_nome or '-' }}</td>
+            <td>
+                {% if lembrete.imovel %}
+                    {{ lembrete.imovel.titulo }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                <a href="{{ url_for('whatsapp_lembrete', id=lembrete.id) }}" class="btn btn-sm" style="background: #25d366; color: white;" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5" style="text-align: center; padding: 30px; color: var(--text-light);">
+                Nenhum lembrete cadastrado.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

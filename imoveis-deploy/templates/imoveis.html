@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Meus Imóveis{% endblock %}
+{% block header %}Meus Imóveis{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Imóveis Cadastrados ({{ imoveis|length }})</h3>
+        <a href="{{ url_for('novo_imovel') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Cadastrar Imóvel
+        </a>
+    </div>
+    
+    {% if imoveis %}
+    <div class="imoveis-grid">
+        {% for imovel in imoveis %}
+        <div class="imovel-card">
+            {% if imovel.foto_capa %}
+            <div class="imovel-foto">
+                <a href="{{ url_for('ver_imovel', id=imovel.id) }}">
+                    <img src="{{ imovel.foto_capa }}" alt="{{ imovel.titulo }}" loading="lazy">
+                </a>
+            </div>
+            {% elif imovel.fotos|length > 0 %}
+            <div class="imovel-foto imovel-foto-placeholder">
+                <i class="fas fa-home"></i>
+            </div>
+            {% endif %}
+            <div class="imovel-header">
+                <span class="badge badge-{{ imovel.negocio }}">{{ imovel.negocio }}</span>
+                <span class="badge badge-{{ imovel.status }}">{{ imovel.status }}</span>
+            </div>
+            <h4><a href="{{ url_for('ver_imovel', id=imovel.id) }}">{{ imovel.titulo }}</a></h4>
+            {% if imovel.preco %}
+            <p class="imovel-preco">{{ imovel.preco }}</p>
+            {% endif %}
+            {% if imovel.endereco or imovel.bairro %}
+            <p class="imovel-endereco"><i class="fas fa-map-marker-alt"></i> {{ imovel.bairro or '' }} {{ imovel.endereco or '' }}</p>
+            {% endif %}
+            <div class="imovel-details">
+                {% if imovel.area %}<span><i class="fas fa-ruler-combined"></i> {{ imovel.area }} m²</span>{% endif %}
+                {% if imovel.quartos %}<span><i class="fas fa-bed"></i> {{ imovel.quartos }}</span>{% endif %}
+                {% if imovel.banheiros %}<span><i class="fas fa-bath"></i> {{ imovel.banheiros }}</span>{% endif %}
+                {% if imovel.vagas %}<span><i class="fas fa-car"></i> {{ imovel.vagas }}</span>{% endif %}
+            </div>
+            {% if imovel.proprietario_telefone %}
+            <p class="imovel-telefone"><i class="fas fa-phone"></i> {{ imovel.proprietario_telefone }}</p>
+            {% endif %}
+            <div class="imovel-actions">
+                <a href="{{ url_for('ver_imovel', id=imovel.id) }}" class="btn btn-sm btn-info">
+                    <i class="fas fa-eye"></i> Ver
+                </a>
+                <a href="{{ url_for('compartilhar_imovel', id=imovel.id) }}" class="btn btn-sm btn-accent" target="_blank" title="Compartilhar">
+                    <i class="fas fa-share-alt"></i>
+                </a>
+                <a href="{{ url_for('editar_imovel', id=imovel.id) }}" class="btn btn-sm btn-secondary">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <form action="{{ url_for('excluir_imovel', id=imovel.id) }}" method="POST" class="inline-form">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Excluir este imóvel?')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">Nenhum imóvel cadastrado. <a href="{{ url_for('novo_imovel') }}">Cadastre o primeiro!</a></p>
+    {% endif %}
+</div>
+{% endblock %}

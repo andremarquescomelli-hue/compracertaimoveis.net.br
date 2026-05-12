@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Matrículas{% endblock %}
+{% block header %}Consultas de Matrícula{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Matrículas Registradas</h3>
+        <a href="{{ url_for('nova_matricula') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Nova Matrícula
+        </a>
+    </div>
+    
+    {% if matriculas %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Endereço</th>
+                <th>Cartório</th>
+                <th>Nº Matrícula</th>
+                <th>Proprietário</th>
+                <th>Contato</th>
+                <th>Situação</th>
+                <th>Consulta</th>
+                <th>Follow-up</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mat in matriculas %}
+            <tr>
+                <td>{{ mat.imovel_endereco }}</td>
+                <td>{{ mat.cartorio or '-' }}</td>
+                <td>{{ mat.numero_matricula or '-' }}</td>
+                <td>{{ mat.proprietario_nome or '-' }}</td>
+                <td>{{ mat.proprietario_contato or '-' }}</td>
+                <td><span class="badge badge-{{ mat.situacao }}">{{ mat.situacao }}</span></td>
+                <td>{{ mat.consulta_data.strftime('%d/%m/%Y') }}</td>
+                <td>{{ mat.followup_data.strftime('%d/%m/%Y') if mat.followup_data else '-' }}</td>
+                <td class="actions">
+                    {% if mat.proprietario_nome %}
+                    <a href="{{ url_for('enriquecer_matricula', id=mat.id) }}" class="btn btn-sm btn-accent" title="Buscar contato">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('editar_matricula', id=mat.id) }}" class="btn btn-sm btn-secondary" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="{{ url_for('excluir_matricula', id=mat.id) }}" method="POST" class="inline-form">
+                        <button type="submit" class="btn btn-sm btn-danger" title="Excluir" onclick="return confirm('Tem certeza?')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">Nenhuma matrícula registrada. <a href="{{ url_for('nova_matricula') }}">Registre a primeira!</a></p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot WhatsApp - Compra Certa Imóveis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: Arial; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #25d366; margin-top: 0; }
+        .whatsapp-btn {
+            display: inline-block;
+            background: #25d366;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .whatsapp-btn:hover { background: #1da851; }
+        .comando {
+            background: #f0f0f0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 8px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .comando:hover { background: #e0e0e0; }
+        .comando small { color: #666; display: block; margin-top: 5px; }
+        .status { padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .status.sucesso { background: #d4edda; color: #155724; }
+        .status.erro { background: #f8d7da; color: #721c24; }
+        input[type="text"] { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; margin: 10px 0; }
+        input[type="text"]:focus { border-color: #25d366; outline: none; }
+        .btn { background: #25d366; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+        .btn:hover { background: #1da851; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1><i class="fab fa-whatsapp"></i> Bot de Comandos WhatsApp</h1>
+            <p>Clique no botão abaixo para abrir o WhatsApp e enviar comandos:</p>
+            
+            <a href="https://wa.me/5518997628360?text=%F0%9F%A4%94%20*OL%C3%81!%20Sou%20o%20Bot%20da%20Compra%20Certa%20Im%C3%B3veis!*%0A%0AEnvie%20um%20comando%3A%0A%0A1.%20cadastrar%20cliente%3A%20NOME%20%7C%20TELEFONE%20%7C%20BAIRRO%0A%0A2.%20cadastrar%20imovel%3A%20TITULO%20%7C%20ENDERECO%20%7C%20PRECO%0A%0A3.%20lembrete%3A%20TITULO%20%7C%20CLIENTE%20%7C%20DATA%20%7C%20HORA%0A%0A4.%20ver%20clientes%0A%0A5.%20ver%20imoveis%0A%0A6.%20ver%20lembretes" target="_blank" class="whatsapp-btn">
+                <i class="fab fa-whatsapp"></i> Abrir WhatsApp com Comandos
+            </a>
+        </div>
+        
+        <div class="card">
+            <h2>📋 Comandos Rápidos</h2>
+            <p>Clique para copiar e enviar:</p>
+            
+            <div class="comando" onclick="copiar('cadastrar cliente: NOME | TELEFONE | BAIRRO')">
+                <strong>📝 Cadastrar Cliente</strong>
+                <small>Ex: cadastrar cliente: João Silva | (18) 99999-8888 | Centro</small>
+            </div>
+            
+            <div class="comando" onclick="copiar('cadastrar imovel: TITULO | ENDEREÇO | PREÇO')">
+                <strong>🏠 Cadastrar Imóvel</strong>
+                <small>Ex: cadastrar imovel: Casa 3q | Rua X | 350.000</small>
+            </div>
+            
+            <div class="comando" onclick="copiar('lembrete: TITULO | CLIENTE | DATA | HORA')">
+                <strong>📅 Criar Lembrete</strong>
+                <small>Ex: lembrete: Visitar casa | João | 15/05 | 14:00</small>
+            </div>
+            
+            <div class="comando" onclick="copiar('ver clientes')">
+                <strong>👥 Ver Clientes</strong>
+            </div>
+            
+            <div class="comando" onclick="copiar('ver imoveis')">
+                <strong>🏠 Ver Imóveis</strong>
+            </div>
+            
+            <div class="comando" onclick="copiar('ver lembretes')">
+                <strong>📅 Ver Lembretes</strong>
+            </div>
+            
+            <div class="comando" onclick="copiar('ajuda')">
+                <strong>❓ Ajuda</strong>
+                <small>Mostra todos os comandos</small>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>💬 Enviar Comando Personalizado</h2>
+            <input type="text" id="comando-personalizado" placeholder="Digite seu comando...">
+            <button onclick="enviarComando()" class="btn">
+                <i class="fab fa-whatsapp"></i> Enviar via WhatsApp
+            </button>
+        </div>
+    </div>
+    
+    <div id="status" class="status" style="display:none;"></div>
+    
+    <script>
+        function copiar(texto) {
+            navigator.clipboard.writeText(texto).then(() => {
+                var status = document.getElementById('status');
+                status.textContent = '✅ Comando copiado! Cole no WhatsApp e envie.';
+                status.className = 'status sucesso';
+                status.style.display = 'block';
+                setTimeout(() => { status.style.display = 'none'; }, 3000);
+            });
+        }
+        
+        function enviarComando() {
+            var comando = document.getElementById('comando-personalizado').value.trim();
+            if (!comando) {
+                alert('Digite um comando!');
+                return;
+            }
+            var url = 'https://wa.me/5518997628360?text=' + encodeURIComponent(comando);
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>

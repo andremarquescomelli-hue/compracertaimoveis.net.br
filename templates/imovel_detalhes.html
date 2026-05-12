@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}{{ imovel.titulo }}{% endblock %}
+{% block header %}{{ imovel.titulo }}{% endblock %}
+
+{% block content %}
+<div class="imovel-detail-grid">
+    <div class="card full-width">
+        {% if imovel.foto_capa or (fotos and fotos|length > 0) %}
+        <div class="gallery-container">
+            <div class="gallery-header">
+                <div class="gallery-controls">
+                    <button id="reorderBtn" class="btn btn-sm btn-secondary" onclick="toggleReorder()">
+                        <i class="fas fa-arrows-alt"></i> Reordenar Fotos
+                    </button>
+                    <button id="saveReorderBtn" class="btn btn-sm btn-success" onclick="saveReorder()" style="display:none;">
+                        <i class="fas fa-save"></i> Salvar Ordem
+                    </button>
+                    <button id="cancelReorderBtn" class="btn btn-sm btn-danger" onclick="cancelReorder()" style="display:none;">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+            <div class="gallery-main" id="mainImageContainer">
+            <img id="mainImage" src="{{ imovel.foto_capa or fotos[0].caminho }}" alt="{{ imovel.titulo }}" onclick="openLightbox()">
+            <div class="gallery-zoom-icon"><i class="fas fa-search-plus"></i></div>
+        </div>
+                <img id="mainImage" src="{{ imovel.foto_capa or fotos[0].caminho }}" alt="{{ imovel.titulo }}">
+                <div class="gallery-zoom-icon"><i class="fas fa-search-plus"></i></div>
+            </div>
+            <div class="gallery-thumbs" id="thumbsContainer">
+                {% for foto in fotos %}
+                <div class="gallery-thumb {% if foto.caminho == imovel.foto_capa %}active{% endif %}" 
+                     data-foto-id="{{ foto.id }}" 
+                     draggable="false"
+                     onclick="changeMainImage('{{ foto.caminho }}', this)">
+                    <img src="{{ foto.caminho }}" alt="Foto {{ foto.ordem + 1 }}">
+                    <div class="thumb-order-badge">{{ loop.index }}</div>
+                    <form action="{{ url_for('excluir_foto', id=imovel.id, foto_id=foto.id) }}" method="POST" class="inline-form" onsubmit="return confirm('Excluir esta foto?')">
+                        <button type="submit" class="thumb-delete" title="Excluir foto">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="imovel-detail-foto imovel-foto-placeholder" style="height: 300px;">
+            <i class="fas fa-home" style="font-size: 5rem;"></i>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2><i class="fas fa-info-circle"></i> Detalhes do Imóvel</h2>
+        <div class="detail-info">
+            <div class="info-row">
+                <span class="label">Tipo:</span>
+                <span class="value">{{ imovel.tipo|capitalize or '-' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Negócio:</span>
+                <span class="value"><span class="badge badge-{{ imovel.negocio }}">{{ imovel.negocio }}</span></span>
+            </div>
+            <div class="info-row">
+                <span class="label">Status:</span>
+                <span class="value"><span class="badge badge-{{ imovel.status }}">{{ imovel.status }}</span></span>
+            </div>
+            <div class="info-row">
+                <span class="label">Preço:</span>
+                <span class="value imovel-preco-grande">{{ imovel.preco or '-' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Endereço:</span>
+                <span class="value">{{ imovel.endereco }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Bairro:</span>
+                <span class="value">{{ imovel.bairro or '-' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Cidade:</span>
+                <span class="value">{{ imovel.cidade }}</span>
+            </div>
+            {% if imovel.cep %}
+            <div class="info-row">
+                <span class="label">CEP:</span>
+                <span class="value">{{ imovel.cep }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2><i class="fas fa-ruler-combined"></i> Características</h2>
+        <div class="detail-info">
+            <div class="info-row">
+                <span class="label">Área:</span>
+                <span class="value">{{ imovel.area }} m²</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Quartos:</span>
+                <span class="value">{{ imovel.quartos or '-' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Banheiros:</span>
+                <span class="value">{{ imovel.banheiros or '-' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Vagas:</span>
+                <span class="value">{{ imovel.vagas or '-' }}</span>
+            </div>
+        </div>
+        {% if imovel.descricao %}
+        <h3 style="margin-top: 20px;">Descrição</h3>
+        <p style="line-height: 1.6;">{{ imovel.descricao }}</p>
+        {% endif %}
+    </div>
+    
+    {% if imovel.proprietario_nome or imovel.proprietario_telefone %}
+    <div class="card">
+        <h2><i class="fas fa-user"></i> Proprietário</h2>
+        <div class="detail-info">
+            {% if imovel.proprietario_nome %}
+            <div class="info-row">
+                <span class="label">Nome:</span>
+                <span class="value">{{ imovel.proprietario_nome }}</span>
+            </div>
+            {% endif %}
+            {% if imovel.proprietario_telefone %}
+            <div class="info-row">
+                <span class="label">Telefone:</span>
+                <span class="value">
+                    {{ imovel.proprietario_telefone }}
+                    <a href="https://api.whatsapp.com/send?phone=55{{ imovel.proprietario_telefone|replace('(','')|replace(')','')|replace(' ','')|replace('-','') }}&text=Olá!" target="_blank" class="btn btn-sm btn-success">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                </span>
+            </div>
+            {% endif %}
+            {% if imovel.proprietario_email %}
+            <div class="info-row">
+                <span class="label">Email:</span>
+                <span class="value">{{ imovel.proprietario_email }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="detail-actions" style="margin-top: 20px;">
+    <a href="{{ url_for('editar_imovel', id=imovel.id) }}" class="btn btn-secondary">
+        <i class="fas fa-edit"></i> Editar
+    </a>
+    <a href="{{ url_for('compartilhar_imovel', id=imovel.id) }}" class="btn btn-accent" target="_blank">
+        <i class="fas fa-share-alt"></i> Compartilhar
+    </a>
+    <form action="{{ url_for('excluir_imovel', id=imovel.id) }}" method="POST" class="inline-form">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Excluir este imóvel?')">
+            <i class="fas fa-trash"></i> Excluir
+        </button>
+    </form>
+    <a href="{{ url_for('listar_imoveis') }}" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<script>
+const fotos = [
+    {% for foto in fotos %}
+    { id: {{ foto.id }}, src: '{{ foto.caminho }}' },
+    {% endfor %}
+];
+let currentIndex = 0;
+let isReorderMode = false;
+
+function changeMainImage(src, el) {
+    document.getElementById('mainImage').src = src;
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    currentIndex = fotos.findIndex(f => f.src === src);
+}
+
+function openLightbox() {
+    if (isReorderMode) return;
+    updateLightbox();
+    document.getElementById('lightbox').style.display = 'flex';
+}
+
+function toggleReorder() {
+    isReorderMode = !isReorderMode;
+    const thumbs = document.querySelectorAll('.gallery-thumb');
+    const saveBtn = document.getElementById('saveReorderBtn');
+    const cancelBtn = document.getElementById('cancelReorderBtn');
+    const reorderBtn = document.getElementById('reorderBtn');
+    const mainImg = document.getElementById('mainImage').parentElement;
+
+    if (isReorderMode) {
+        thumbs.forEach(t => {
+            t.draggable = true;
+            t.classList.add('reorder-active');
+            setupDragEvents(t);
+        });
+        saveBtn.style.display = 'inline-flex';
+        cancelBtn.style.display = 'inline-flex';
+        reorderBtn.style.display = 'none';
+        mainImg.style.pointerEvents = 'none';
+        mainImg.style.opacity = '0.5';
+    } else {
+        cancelReorder();
+    }
+}
+
+function cancelReorder() {
+    isReorderMode = false;
+    const thumbs = document.querySelectorAll('.gallery-thumb');
+    thumbs.forEach(t => {
+        t.draggable = false;
+        t.classList.remove('reorder-active');
+    });
+    document.getElementById('saveReorderBtn').style.display = 'none';
+    document.getElementById('cancelReorderBtn').style.display = 'none';
+    document.getElementById('reorderBtn').style.display = 'inline-flex';
+    document.getElementById('mainImage').parentElement.style.pointerEvents = '';
+    document.getElementById('mainImage').parentElement.style.opacity = '';
+    updateOrderBadges();
+}
+
+function saveReorder() {
+    const thumbs = document.querySelectorAll('.gallery-thumb');
+    const newOrder = Array.from(thumbs).map(t => parseInt(t.dataset.fotoId));
+
+    fetch('{{ url_for("reorder_fotos", id=imovel.id) }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: newOrder })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Ordem salva com sucesso!');
+            cancelReorder();
+            location.reload();
+        }
+    })
+    .catch(err => alert('Erro ao salvar ordem'));
+}
+
+function updateOrderBadges() {
+    document.querySelectorAll('.gallery-thumb').forEach((thumb, index) => {
+        const badge = thumb.querySelector('.thumb-order-badge');
+        if (badge) badge.textContent = index + 1;
+    });
+}
+
+function setupDragEvents(el) {
+    el.addEventListener('dragstart', function(e) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.target.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', e.target.dataset.fotoId);
+    });
+    
+    el.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const dragging = document.querySelector('.dragging');
+        if (dragging && dragging !== e.currentTarget) {
+            const container = document.getElementById('thumbsContainer');
+            const thumbs = Array.from(container.children);
+            const dragIdx = thumbs.indexOf(dragging);
+            const dropIdx = thumbs.indexOf(e.currentTarget);
+            
+            if (dragIdx < dropIdx) {
+                container.insertBefore(dragging, e.currentTarget.nextSibling);
+            } else {
+                container.insertBefore(dragging, e.currentTarget);
+            }
+            updateOrderBadges();
+        }
+    });
+    
+    el.addEventListener('dragend', function(e) {
+        e.target.classList.remove('dragging');
+        updateOrderBadges();
+    });
+}
+
+function openLightbox(src) {
+    if (isReorderMode) return;
+    currentIndex = fotos.findIndex(f => f.src === src);
+    if (currentIndex === -1) currentIndex = 0;
+    updateLightbox();
+    document.getElementById('lightbox').style.display = 'flex';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+}
+
+function navigate(direction) {
+    currentIndex += direction;
+    if (currentIndex < 0) currentIndex = fotos.length - 1;
+    if (currentIndex >= fotos.length) currentIndex = 0;
+    updateLightbox();
+}
+
+function updateLightbox() {
+    document.getElementById('lightboxImage').src = fotos[currentIndex].src;
+}
+
+document.addEventListener('keydown', function(e) {
+    if (document.getElementById('lightbox').style.display === 'flex') {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') navigate(-1);
+        if (e.key === 'ArrowRight') navigate(1);
+    }
+});
+</script>
+
+<div id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-nav prev" onclick="event.stopPropagation(); navigate(-1)"><i class="fas fa-chevron-left"></i></button>
+    <img id="lightboxImage" src="" alt="Imagem em tela cheia" onclick="event.stopPropagation()">
+    <button class="lightbox-nav next" onclick="event.stopPropagation(); navigate(1)"><i class="fas fa-chevron-right"></i></button>
+    <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+</div>
+{% endblock %}

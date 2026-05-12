@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ imovel.titulo }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border-radius: 0 0 20px 20px; margin-bottom: 30px; }
+        .header h1 { font-size: 1.8rem; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1rem; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin: 5px; }
+        .badge-venda { background: rgba(255,255,255,0.2); color: white; }
+        .badge-aluguel { background: rgba(255,255,255,0.2); color: white; }
+        .gallery-main { width: 100%; height: 350px; border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .gallery-main img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-thumbs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 30px; }
+        .gallery-thumbs::-webkit-scrollbar { height: 6px; }
+        .gallery-thumbs::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .gallery-thumb { flex-shrink: 0; width: 80px; height: 60px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 3px solid transparent; transition: all 0.2s; }
+        .gallery-thumb:hover, .gallery-thumb.active { border-color: #2563eb; transform: scale(1.05); }
+        .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card h2 { font-size: 1.3rem; margin-bottom: 15px; color: #475569; display: flex; align-items: center; gap: 10px; }
+        .card h2 i { color: #2563eb; }
+        .preco { font-size: 2rem; font-weight: 700; color: #2563eb; margin: 10px 0; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; }
+        .feature { text-align: center; padding: 15px; background: #f8fafc; border-radius: 10px; }
+        .feature i { font-size: 1.5rem; color: #2563eb; margin-bottom: 8px; }
+        .feature .value { font-size: 1.2rem; font-weight: 700; }
+        .feature .label { font-size: 0.8rem; color: #64748b; }
+        .localizacao { display: flex; align-items: center; gap: 10px; padding: 15px; background: #f8fafc; border-radius: 10px; margin: 10px 0; }
+        .localizacao i { font-size: 1.5rem; color: #ef4444; }
+        .descricao { line-height: 1.7; color: #475569; white-space: pre-line; }
+        .cta { text-align: center; padding: 30px 20px; }
+        .cta-btn { display: inline-flex; align-items: center; gap: 10px; padding: 15px 30px; background: #25d366; color: white; text-decoration: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; transition: all 0.2s; }
+        .cta-btn:hover { background: #128c7e; transform: translateY(-2px); }
+        .share-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .share-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 50px; text-decoration: none; color: white; font-weight: 500; transition: all 0.2s; }
+        .share-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .share-whatsapp { background: #25d366; }
+        .share-facebook { background: #1877F2; }
+        .share-copy { background: #64748b; }
+        .footer { text-align: center; padding: 20px; color: #94a3b8; font-size: 0.85rem; }
+        .no-fotos { width: 100%; height: 350px; background: #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #94a3b8; margin-bottom: 20px; }
+        .no-fotos i { font-size: 4rem; }
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.4rem; }
+            .gallery-main { height: 250px; }
+            .preco { font-size: 1.5rem; }
+            .features { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="badge badge-{{ imovel.negocio }}">{{ imovel.negocio }}</span>
+        <h1>{{ imovel.titulo }}</h1>
+        <p>{{ imovel.tipo|capitalize }} em {{ imovel.bairro or imovel.cidade }}</p>
+    </div>
+
+    <div class="container">
+        {% if fotos %}
+        <div class="gallery-main">
+            <img id="mainImage" src="{{ imovel.foto_capa or fotos[0].caminho }}" alt="{{ imovel.titulo }}">
+        </div>
+        {% if fotos|length > 1 %}
+        <div class="gallery-thumbs">
+            {% for foto in fotos %}
+            <div class="gallery-thumb {% if foto.caminho == imovel.foto_capa %}active{% endif %}" onclick="changeImage('{{ foto.caminho }}', this)">
+                <img src="{{ foto.caminho }}" alt="Foto {{ foto.ordem + 1 }}">
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="no-fotos"><i class="fas fa-home"></i></div>
+        {% endif %}
+
+        {% if imovel.preco %}
+        <div class="card">
+            <div class="preco">{{ imovel.preco }}</div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h2><i class="fas fa-ruler-combined"></i> Características</h2>
+            <div class="features">
+                {% if imovel.area %}
+                <div class="feature">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <div class="value">{{ imovel.area }}</div>
+                    <div class="label">m²</div>
+                </div>
+                {% endif %}
+                {% if imovel.quartos %}
+                <div class="feature">
+                    <i class="fas fa-bed"></i>
+                    <div class="value">{{ imovel.quartos }}</div>
+                    <div class="label">Quartos</div>
+                </div>
+                {% endif %}
+                {% if imovel.banheiros %}
+                <div class="feature">
+                    <i class="fas fa-bath"></i>
+                    <div class="value">{{ imovel.banheiros }}</div>
+                    <div class="label">Banheiros</div>
+                </div>
+                {% endif %}
+                {% if imovel.vagas %}
+                <div class="feature">
+                    <i class="fas fa-car"></i>
+                    <div class="value">{{ imovel.vagas }}</div>
+                    <div class="label">Vagas</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-map-marker-alt"></i> Localização</h2>
+            <div class="localizacao">
+                <i class="fas fa-map-pin"></i>
+                <div>
+                    <strong>{{ imovel.bairro or 'Bairro' }}</strong>
+                    <p style="color: #64748b; font-size: 0.9rem;">{{ imovel.cidade }}</p>
+                </div>
+            </div>
+            <p class="text-muted" style="color: #94a3b8; font-size: 0.85rem; margin-top: 10px;">
+                <i class="fas fa-info-circle"></i> Endereço completo disponível mediante contato
+            </p>
+        </div>
+
+        {% if imovel.descricao %}
+        <div class="card">
+            <h2><i class="fas fa-file-alt"></i> Descrição</h2>
+            <p class="descricao">{{ imovel.descricao }}</p>
+        </div>
+        {% endif %}
+
+        <div class="cta">
+            <a href="https://api.whatsapp.com/send?text=Olá! Vi o imóvel '{{ imovel.titulo }}' e gostaria de mais informações." target="_blank" class="cta-btn">
+                <i class="fab fa-whatsapp"></i> Tenho Interesse
+            </a>
+        </div>
+
+        <div class="share-buttons">
+            <a href="https://api.whatsapp.com/send?text={{ imovel.titulo }} - {{ imovel.tipo|capitalize }} em {{ imovel.bairro or imovel.cidade }} - {{ imovel.preco }}" target="_blank" class="share-btn share-whatsapp">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="share-btn share-facebook">
+                <i class="fab fa-facebook"></i> Facebook
+            </a>
+            <a href="#" onclick="copiarLink(event)" class="share-btn share-copy">
+                <i class="fas fa-link"></i> Copiar Link
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Anúncio enviado por corretor de imóveis</p>
+    </div>
+
+    <script>
+        function changeImage(src, el) {
+            document.getElementById('mainImage').src = src;
+            document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+        }
+        function copiarLink(e) {
+            e.preventDefault();
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link copiado!');
+        }
+    </script>
+</body>
+</html>
