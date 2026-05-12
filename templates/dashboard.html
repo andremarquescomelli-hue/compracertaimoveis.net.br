@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block title %}Dashboard{% endblock %}
-{% block header %}Dashboard{% endblock %}
+{% block header %}
+<img src="{{ url_for('static', filename='logo.png') }}" alt="Compra Certa Imóveis" style="max-height: 60px; margin-bottom: 10px;">
+<br>Dashboard
+{% endblock %}
 
 {% block content %}
 <div class="stats-grid">
