@@ -103,18 +103,10 @@
     </style>
 </head>
 <body>
-    <div class="login-header">
+    <div class="login-header" style="flex-direction: column; text-align: center;">
         <div class="login-header-logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Compra Certa Imóveis">
-            <p style="text-align: center; font-size: 1.3rem; font-weight: bold; margin-top: 15px; color: var(--white);">Login Administrativo</p>
-            <div class="login-header-contato">
-                <p><i class="fas fa-phone"></i> (18) 99762-8360</p>
-                <p><i class="fas fa-map-marker-alt"></i> Assis-SP</p>
-            </div>
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Compra Certa Imóveis" style="max-width: 300px;">
         </div>
-        <a href="https://wa.me/5518997628360" target="_blank" class="contact-phone">
-            <i class="fab fa-whatsapp"></i> WhatsApp
-        </a>
     </div>
 
     <div class="login-container">
